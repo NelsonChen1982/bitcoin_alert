@@ -1,0 +1,104 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    background-color: #0f0f14;
+    color: #e2e8f0;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+}
+
+@layer components {
+  .card {
+    @apply bg-[#1a1a24] border border-[#2a2a3a] rounded-2xl p-5;
+  }
+
+  .card-hover {
+    @apply transition-all duration-200 hover:border-[#3a3a4e] hover:bg-[#22222e];
+  }
+
+  .signal-green {
+    @apply text-[#00d68f] bg-[#00d68f]/10 border border-[#00d68f]/30;
+  }
+
+  .signal-yellow {
+    @apply text-[#ffb700] bg-[#ffb700]/10 border border-[#ffb700]/30;
+  }
+
+  .signal-orange {
+    @apply text-[#ff7f00] bg-[#ff7f00]/10 border border-[#ff7f00]/30;
+  }
+
+  .signal-red {
+    @apply text-[#ff4757] bg-[#ff4757]/10 border border-[#ff4757]/30;
+  }
+
+  .signal-gray {
+    @apply text-gray-400 bg-gray-800/50 border border-gray-700;
+  }
+
+  .metric-value {
+    @apply font-mono text-3xl font-semibold text-white;
+  }
+
+  .metric-label {
+    @apply text-xs uppercase tracking-widest text-gray-500 font-medium;
+  }
+
+  .section-title {
+    @apply text-lg font-semibold text-white mb-1;
+  }
+
+  .section-desc {
+    @apply text-xs text-gray-500;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #1a1a24;
+}
+::-webkit-scrollbar-thumb {
+  background: #3a3a4e;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #4a4a5e;
+}
+
+/* Loading shimmer */
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+.shimmer {
+  background: linear-gradient(90deg, #1a1a24 25%, #2a2a3a 50%, #1a1a24 75%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+/* Number counter animation */
+@keyframes countUp {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.count-animate {
+  animation: countUp 0.3s ease-out;
+}
