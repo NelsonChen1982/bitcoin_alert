@@ -61,30 +61,34 @@ export function calculateZScore(currentPrice: number, weeklyPrices: PricePoint[]
 }
 
 /**
- * Rainbow Chart: Power-law logarithmic regression
+ * Rainbow Chart: Halving Price Regression (matching Bitbo / @ChartsBtc)
  *
- * Formula: log10(price) = a × log10(days_since_genesis) + b
- * Equivalent: price = 10 ^ (a × log10(days) + b)
+ * Each band is the HPR regression line TIME-SHIFTED by multiples of 365 days:
+ *   log10(price_i) = 2.6521 × ln(D + c_base + i × step) − 18.163
  *
- * Coefficients (community standard, Dave the Wave / lookintobitcoin):
- *   a =  5.84509   ← POSITIVE (price grows with time)
- *   b = -17.01593
+ * Where:
+ *   D = days from 2009-01-09 + 1 (Bitbo reference epoch)
+ *   c_base = −182.5  (Low band shift)
+ *   step = 228.125   (= 5 × 365 / 8, maps 6 Bitbo bands → our 9 bands)
  *
- * Verification (today, ~6264 days since genesis):
- *   log10(6264) = 3.797
- *   5.84509 × 3.797 − 17.016 = 5.17  →  10^5.17 ≈ $148k  (regression midpoint)
+ * Bitbo uses 6 bands (Low → Red) each shifted by 365 days.
+ * We use 9 bands covering the same range for finer granularity.
+ *
+ * Verified against Bitbo Plotly data (std dev of c ≤ 0.2 per band).
  */
 export function getRainbowBands(daysFromGenesis: number): number[] {
-  const a =  5.84509
-  const b = -17.01593
-  const base = a * Math.log10(daysFromGenesis) + b   // log10, NOT ln
+  const A = 2.6521
+  const B = -18.163
+  // Bitbo epoch: 2009-01-09 (6 days after genesis), D starts at 1
+  const D = daysFromGenesis - 5
+  const cBase = -182.5       // Low band time shift
+  const step  = 228.125      // 1825 / 8 — 9 bands spanning same range as Bitbo's 6
 
-  // 9 offsets calibrated to full Bitcoin history (2013–present), matching Bitbo's visual:
-  //   Bottom: COVID crash 2020 = -0.49, 2022 bear = -0.44
-  //   Top:    2013 Nov bubble = +1.09, 2017 peak = +0.79
-  // Range: -0.75 → +1.18 contains ALL historical price action including 2013 extreme
-  const offsets = [-0.75, -0.50, -0.26, -0.02, 0.22, 0.46, 0.70, 0.94, 1.18]
-  return offsets.map(offset => Math.pow(10, base + offset))
+  return Array.from({ length: 9 }, (_, i) => {
+    const shift = D + cBase + i * step
+    if (shift <= 0) return NaN  // Too early for this band
+    return Math.pow(10, A * Math.log(shift) + B)
+  })
 }
 
 /**
