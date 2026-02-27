@@ -79,11 +79,11 @@ export function getRainbowBands(daysFromGenesis: number): number[] {
   const b = -17.01593
   const base = a * Math.log10(daysFromGenesis) + b   // log10, NOT ln
 
-  // 9 offsets calibrated to actual historical BTC price extremes:
-  //   Bottom: 2022 low = -0.44, 2018 low = -0.29
-  //   Top:    2017 peak = +0.77, 2021 peak = +0.39 (less extreme cycle)
-  // Range: -0.55 → +0.80 covers all historical price action
-  const offsets = [-0.55, -0.40, -0.25, -0.08, 0.10, 0.28, 0.45, 0.62, 0.80]
+  // 9 offsets calibrated to full Bitcoin history (2013–present), matching Bitbo's visual:
+  //   Bottom: COVID crash 2020 = -0.49, 2022 bear = -0.44
+  //   Top:    2013 Nov bubble = +1.09, 2017 peak = +0.79
+  // Range: -0.75 → +1.18 contains ALL historical price action including 2013 extreme
+  const offsets = [-0.75, -0.50, -0.26, -0.02, 0.22, 0.46, 0.70, 0.94, 1.18]
   return offsets.map(offset => Math.pow(10, base + offset))
 }
 

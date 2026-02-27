@@ -87,6 +87,7 @@ function buildChartData() {
   store.weeklyHistory.forEach((point) => {
     const date = new Date(point.timestamp)
     labels.push(date.toISOString().split('T')[0])
+
     priceData.push(point.price)
 
     const daysFromGenesis = (point.timestamp - GENESIS) / (1000 * 60 * 60 * 24)
