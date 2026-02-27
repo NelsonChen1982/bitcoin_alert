@@ -57,10 +57,7 @@ import { getAHR999Signal } from '~/utils/signals'
 
 const store = useBtcStore()
 
-const ahr999Raw = computed(() => {
-  if (store.ahr999 === null) return null
-  return store.ahr999 / 100
-})
+const ahr999Raw = computed(() => store.ahr999)
 
 const signal = computed(() => getAHR999Signal(store.ahr999))
 

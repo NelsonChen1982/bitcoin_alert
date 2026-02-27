@@ -4,14 +4,12 @@ export function makeSignal(level: SignalLevel, label: string, description: strin
   return { level, label, description }
 }
 
-// AHR999 signals (value is the raw ratio * 100)
+// AHR999 signals — value is the direct ahr999 index (no scaling)
 export function getAHR999Signal(value: number | null): Signal {
   if (value === null) return makeSignal('gray', '載入中', '正在獲取資料...')
-  // AHR999 raw (not * 100)
-  const v = value / 100
-  if (v < 0.45) return makeSignal('green', '抄底區', '強烈買入訊號，歷史大底部位')
-  if (v < 1.2) return makeSignal('yellow', '定投區', '適合持續定投，風險可控')
-  if (v < 2.0) return makeSignal('orange', '偏貴', '市場偏熱，謹慎加倉')
+  if (value < 0.45) return makeSignal('green', '抄底區', '強烈買入訊號，歷史大底部位')
+  if (value < 1.2) return makeSignal('yellow', '定投區', '適合持續定投，風險可控')
+  if (value < 5.0) return makeSignal('orange', '偏貴', '市場偏熱，謹慎加倉')
   return makeSignal('red', '高風險', '估值偏高，考慮分批獲利')
 }
 

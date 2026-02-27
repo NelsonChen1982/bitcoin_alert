@@ -5,23 +5,34 @@ const GENESIS_TIMESTAMP = new Date('2009-01-03').getTime()
 const MS_PER_YEAR = 365.25 * 24 * 60 * 60 * 1000
 
 /**
- * AHR999 = price / (200日均線) / (1.0 ^ (daysFromGenesis / 365 * 2.09))
- * Simplified version: price / dailyMA200 / exp(0.000569 * daysFromGenesis)
+ * AHR999 指數 = (price / 200日均線) × (price / 冪律增長估值)
+ *
+ * Standard formula (Nine God / ahr999):
+ *   ahr999 = (P / MA200) × (P / V)
+ *   where V = 10^(5.84 × log10(days_since_genesis) − 17.01)
+ *
+ * V is the Bitcoin power-law regression model (same as rainbow chart midline).
+ *
+ * Thresholds:
+ *   < 0.45  → 抄底區 (strong buy, historically ~8.5% of time)
+ *   0.45–1.2 → 定投區 (DCA zone, ~46% of time)
+ *   > 1.2   → 等待 / 偏貴
  */
 export function calculateAHR999(currentPrice: number, dailyPrices: PricePoint[]): number | null {
   if (!currentPrice || dailyPrices.length < 200) return null
 
-  // Calculate 200-day MA
+  // Calculate 200-day simple moving average
   const last200 = dailyPrices.slice(-200)
   const ma200 = last200.reduce((sum, p) => sum + p.price, 0) / last200.length
 
   // Days since genesis
   const daysFromGenesis = (Date.now() - GENESIS_TIMESTAMP) / (1000 * 60 * 60 * 24)
 
-  // Power growth baseline (approximation)
-  const baseline = Math.pow(2.09, daysFromGenesis / 365)
+  // Power-law growth estimate: V = 10^(5.84 × log10(days) − 17.01)
+  const growthEstimate = Math.pow(10, 5.84 * Math.log10(daysFromGenesis) - 17.01)
 
-  return currentPrice / ma200 / baseline * 100
+  // AHR999 = (price / MA200) × (price / growthEstimate)
+  return (currentPrice / ma200) * (currentPrice / growthEstimate)
 }
 
 /**
